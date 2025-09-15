@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+build/
+dist/
+*.egg-info/
+.Python
+env/
+venv/
+.env
+.venv
+
+# Cython
+*.c
+*.cpp
+*.html
+
+# Build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.dylib
+*.a
+*.lib
+
+# CUDA
+*.cubin
+*.fatbin
+*.ptx
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# System
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+tmp/

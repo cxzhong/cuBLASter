@@ -1,0 +1,26 @@
+# Include documentation
+include README.md
+include LICENSE
+
+# Include configuration files
+include pyproject.toml
+include Makefile
+include .gitignore
+
+# Include core source files
+recursive-include core *.hpp *.cu *.pyx *.pxd
+
+# Include Python source
+recursive-include src *.py
+
+# Include examples
+recursive-include examples *.py *.txt
+
+# Exclude build artifacts
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.so
+global-exclude __pycache__
+global-exclude build
+global-exclude dist
+global-exclude *.egg-info
