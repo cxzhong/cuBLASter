@@ -1,0 +1,43 @@
+# Python cache
+__pycache__
+
+# Shared libraries
+*.so
+
+# Swap files
+*.swp
+
+# Input/output lattice bases
+/input/
+/output/
+
+# Cython related files
+/build/
+
+# Local eigen files
+/eigen*
+
+# Local venv
+/activate
+/python3
+/venv/
+
+# cysignals creates this directory when Ctrl+C'ing during execution
+cysignals_crash_logs/
+
+# Benchmarks generate big logs
+/logs/
+/logs-flatter/
+/benchmark/results/
+
+logs_other_*.csv
+
+blaster.egg-info
+
+slope-graphs-blaster
+
+logs_errors
+
+*.log
+gpu_temp_log.csv
+*.html
