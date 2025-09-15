@@ -43,9 +43,9 @@ Optional:
 
 ## Installation
 
-### CUDA Setup
+### CUDA Setup (Optional)
 
-First, ensure you have CUDA Toolkit installed:
+If you have an NVIDIA GPU and want GPU acceleration:
 
 ```bash
 # Check CUDA installation
@@ -62,9 +62,22 @@ nvidia-smi
 # sudo apt-get -y install cuda-toolkit-12-3
 ```
 
-### Modern PEP 517 Installation (Recommended)
+### Build from Source
 
-cuBLASter supports modern Python packaging with automatic dependency management:
+cuBLASter automatically detects CUDA availability and falls back to CPU implementation if CUDA is not available:
+
+```bash
+# Install build dependencies
+pip install numpy cython cysignals setuptools wheel
+
+# Build the extension
+python setup.py build_ext --inplace
+
+# Test the installation
+python test_app.py
+```
+
+### Modern PEP 517 Installation (when network available)
 
 ```bash
 # Install from source (automatically detects CUDA)
@@ -74,9 +87,9 @@ pip install -e .
 python -m build
 ```
 
-### Environment Variables
+### Environment Variables (for CUDA)
 
-You may need to set these environment variables:
+You may need to set these environment variables if CUDA is installed in a non-standard location:
 
 ```bash
 export CUDA_HOME=/usr/local/cuda
@@ -86,30 +99,100 @@ export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 
 ## Running
 
-*Note: you first need to build the software, see above.*
+### Basic Usage
 
-Run the command by e.g. typing `./python3 src/app.py -pvi INPUTFILE`.
-Add `-h` for seeing all available command line arguments.
+```bash
+# Build the extension
+python setup.py build_ext --inplace
+
+# Test the core functionality
+python test_app.py
+
+# Test matrix operations directly
+python -c "
+import sys; sys.path.insert(0, '.')
+import cublaster_core
+cublaster_core.init_cuda(0)
+print('Memory:', cublaster_core.get_memory_info())
+"
+```
+
+*Note: The full application interface (src/app.py) requires proper package installation.*
 
 ## Example
 
-Command: `time latticegen q 128 64 20 p | src/app.py -pq`.
+### Matrix Operations Test
+
+```python
+import cublaster_core
+import numpy as np
+
+# Initialize (automatically detects CUDA or uses CPU fallback)
+cublaster_core.init_cuda(0)
+
+# Test matrix multiplication
+A = np.array([[1, 2], [3, 4]], dtype=np.int64)
+B = np.array([[5, 6], [7, 8]], dtype=np.int64)
+C = cublaster_core.matmul(A, B)
+print("A @ B =", C)  # Output: [[19, 22], [43, 50]]
+
+# Check memory usage
+mem_info = cublaster_core.get_memory_info()
+print(f"Memory: {mem_info['used_mb']}MB used / {mem_info['total_mb']}MB total")
+```
+
+### Command Line Test
+
+```bash
+python test_app.py
+```
 
 Expected output:
 ```
-Profile: [9.38 9.39 9.30 9.28 9.18 ... 4.27 4.33 4.31 4.29 4.35]
-Root Hermite factor: 1.020447, ∥b_1∥ = 11906.636
-GPU Memory Used: 245MB
+cuBLASter Application Test
+==================================================
+Warning: CUDA not available, using CPU fallback  # (or GPU info if CUDA available)
+GPU Memory: 0MB used / 1024MB total
+Lattice dimensions: 4 x 4
+Input lattice:
+[[ 1  2  3  4]
+ [ 5  6  7  8]
+ [ 9 10 11 12]
+ [13 14 15 16]]
 
-real	0m0,354s
-user	0m1,271s
-sys	0m0,095s
+Self-multiplication result:
+[[ 90 100 110 120]
+ [202 228 254 280]
+ [314 356 398 440]
+ [426 484 542 600]]
+
+Profile: [0.74, 1.12, 1.32, 1.46]
+∥b_1∥ = 5.477
+
+✓ Application test completed successfully
 ```
-
-To run deep-LLL with depth `4`, run `src/app.py -pq -i {lattice} -d4`.
-
-To run progressive BKZ-60 (with 4-deep-LLL) with `1` tours and block size increments of `2`, run `src/app.py -pq -i {lattice} -b60 -t1 -P2`.
 
 ## GPU Memory Management
 
 cuBLASter automatically manages GPU memory and will display memory usage information. For large lattices, ensure your GPU has sufficient memory.
+
+## Current Implementation Status
+
+This implementation provides:
+
+✅ **Core Infrastructure**: Complete build system with CUDA and CPU fallback  
+✅ **Matrix Operations**: GPU-accelerated matrix multiplication using cuBLAS  
+✅ **Memory Management**: Automatic GPU memory allocation and cleanup  
+✅ **Python Bindings**: Cython-based interface with proper error handling  
+✅ **CPU Fallback**: Automatic fallback when CUDA is not available  
+
+🚧 **Lattice Reduction Algorithms**: Currently implemented as placeholder  
+   - The core lattice reduction algorithms from BLASter need to be ported
+   - Matrix operations are working and ready for algorithm implementation
+   - Structure is in place for deep-LLL, BKZ, and other algorithms
+
+🔧 **Coming Next**: 
+   - Port core lattice reduction algorithms to use GPU matrix operations
+   - Implement progressive BKZ with GPU acceleration
+   - Add comprehensive test suite
+   - Performance benchmarking against CPU version

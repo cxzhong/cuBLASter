@@ -1,5 +1,5 @@
 # distutils: language = c++
-# distutils: sources = core/cuda_matmul.cu
+# Note: The actual source file (CUDA or CPU fallback) is determined at build time
 
 import numpy as np
 cimport numpy as cnp

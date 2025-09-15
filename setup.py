@@ -24,17 +24,21 @@ class BuildExtension(build_ext):
     """Custom build extension to handle CUDA compilation"""
     
     def build_extensions(self):
-        # Find CUDA installation
-        cuda_home = self._find_cuda()
-        if not cuda_home:
-            raise RuntimeError("CUDA installation not found. Please install CUDA toolkit.")
+        # Check if we have CUDA extensions
+        has_cuda_ext = any(isinstance(ext, CudaExtension) for ext in self.extensions)
         
-        print(f"Found CUDA at: {cuda_home}")
-        
-        # Update compiler settings for CUDA extensions
-        for ext in self.extensions:
-            if isinstance(ext, CudaExtension):
-                self._configure_cuda_extension(ext, cuda_home)
+        if has_cuda_ext:
+            # Find CUDA installation
+            cuda_home = self._find_cuda()
+            if not cuda_home:
+                raise RuntimeError("CUDA installation not found. Please install CUDA toolkit.")
+            
+            print(f"Found CUDA at: {cuda_home}")
+            
+            # Update compiler settings for CUDA extensions
+            for ext in self.extensions:
+                if isinstance(ext, CudaExtension):
+                    self._configure_cuda_extension(ext, cuda_home)
         
         # Call parent build
         build_ext.build_extensions(self)

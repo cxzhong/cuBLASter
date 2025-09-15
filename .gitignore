@@ -13,9 +13,8 @@ venv/
 .env
 .venv
 
-# Cython
-*.c
-*.cpp
+# Cython generated files (but not our source)
+core/cublaster.c
 *.html
 
 # Build artifacts

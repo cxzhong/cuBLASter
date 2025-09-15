@@ -6,7 +6,7 @@ cdef extern from "types.hpp":
     cdef int MAX_ENUM_N
 
 # These functions are available in both CUDA and CPU fallback versions
-cdef extern from *:
+cdef extern from "cuda_interface.hpp":
     void cuda_init(int device_id) except +
     void cuda_cleanup() except +
     void cuda_memory_info(size_t* free_mem, size_t* total_mem) except +
